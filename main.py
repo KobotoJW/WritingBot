@@ -53,9 +53,13 @@ def first_markov(text):
         total = sum(markov[elem].values())
         for elem2 in markov[elem]:
             markov[elem][elem2] = markov[elem][elem2]/total
+    markov_sorted = {}
+    for elem in sorted(markov):
+        markov_sorted.update({elem: sorted(markov[elem].items(), key=lambda item: item[1], reverse=True)})
+
     #print("Markov: ")
-    #print(markov)
-    return markov
+    #print(markov_sorted)
+    return markov_sorted
 
 def third_markov(text):
     markov = {}
@@ -71,9 +75,12 @@ def third_markov(text):
         total = sum(markov[elem].values())
         for elem2 in markov[elem]:
             markov[elem][elem2] = markov[elem][elem2]/total
+    markov_sorted = {}
+    for elem in sorted(markov):
+        markov_sorted.update({elem: sorted(markov[elem].items(), key=lambda item: item[1], reverse=True)})
     # print("Markov: ")
     # print(markov)
-    return markov
+    return markov_sorted
 
 def fith_markov(text):
     markov = {}
@@ -89,41 +96,48 @@ def fith_markov(text):
         total = sum(markov[elem].values())
         for elem2 in markov[elem]:
             markov[elem][elem2] = markov[elem][elem2]/total
+    markov_sorted = {}
+    for elem in sorted(markov):
+        markov_sorted.update({elem: sorted(markov[elem].items(), key=lambda item: item[1], reverse=True)})
     #print("Markov: ")
     #print(markov)
-    return markov
+    return markov_sorted
 
 def generate(length, character_set, starting_set, first_markov, third_markov, fith_markov):
-    result = ''
+    result = 'you'
     previous = ''
     last_word = ''
     for i in range(length):
-        last_word = result.split(' ')[-1]
+        previous = result[-1]
+        last_word = result[-5:]
         if previous == '':
             result += random.choices(list(starting_set.keys()), list(starting_set.values()))[0]
         else:
             if len(last_word) < 3:
                 try:
-                    result += random.choices(list(first_markov[previous].keys()), list(first_markov[previous].values()))[0]
+                    result += first_markov[previous][0][random.randint(0, 2)]
                 except:
-                     result += random.choices(list(starting_set.keys()), list(starting_set.values()))[0]
+                    result += random.choices(list(character_set.keys()), list(character_set.values()))[0]
             elif len(last_word) < 5:
                 try:
-                    result += random.choices(list(third_markov[last_word[-3::1]].keys()), list(third_markov[last_word[-3::1]].values()))[0]
-                except:
-                    result += random.choices(list(first_markov[previous].keys()), list(first_markov[previous].values()))[0]
-            elif len(last_word) >= 5:
-                try:
-                    result += random.choices(list(fith_markov[last_word[-5::1]].keys()), list(fith_markov[last_word[-5::1]].values()))[0]
+                    result += third_markov[last_word][0][random.randint(0, 2)]
                 except:
                     try:
-                        result += random.choices(list(third_markov[last_word[-3::1]].keys()), list(third_markov[last_word[-3::1]].values()))[0]
+                        result += first_markov[last_word][0][random.randint(0, 2)]
+                    except:
+                        result += random.choices(list(character_set.keys()), list(character_set.values()))[0]
+            else:
+                try:
+                    result += fith_markov[last_word][0][random.randint(0, 2)]
+                except:
+                    try:
+                        result += third_markov[last_word][0][random.randint(0, 2)]
                     except:
                         try:
-                            result += random.choices(list(first_markov[previous].keys()), list(first_markov[previous].values()))[0]
+                            result += first_markov[last_word][0][random.randint(0, 2)]
                         except:
-                            result += random.choices(list(starting_set.keys()), list(starting_set.values()))[0]
-        previous = result[-1]
+                            result += random.choices(list(character_set.keys()), list(character_set.values()))[0]
+        #print('Word: ', last_word, ' Letter: ', previous)
     return result
 
 def main():
@@ -135,7 +149,7 @@ def main():
     first_markov_set = first_markov(text[0])
     third_markov_set = third_markov(text[0])
     fith_markov_set = fith_markov(text[0])
-    print(generate(1000, characters_set, starting_chars_set, first_markov_set, third_markov_set, fith_markov_set))
+    print(generate(100, characters_set, starting_chars_set, first_markov_set, third_markov_set, fith_markov_set))
 
 if __name__ == '__main__':
     main()
